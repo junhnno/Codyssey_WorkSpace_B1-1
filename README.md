@@ -39,6 +39,8 @@ Port 20022
 PermitRootLogin no
 ```
 
+![SSH 보안 설정 확인](images/1.SSH%20보안.png)
+
 ---
 
 ## 2단계. 방화벽 설정
@@ -67,6 +69,8 @@ To                         Action      From
 20022/tcp                  ALLOW       Anywhere
 15034/tcp                  ALLOW       Anywhere
 ```
+
+![방화벽 설정 확인](images/2.방화벽(UFW%20또는%20firewalld)%20활성화.png)
 
 ---
 
@@ -113,6 +117,8 @@ uid=1000(agent-admin) gid=1002(agent-admin) groups=1002(agent-admin),1000(agent-
 uid=1001(agent-dev)   gid=1003(agent-dev)   groups=1003(agent-dev),1000(agent-common),1001(agent-core)
 uid=1002(agent-test)  gid=1004(agent-test)  groups=1004(agent-test),1000(agent-common)
 ```
+
+![계정 그룹 생성 확인](images/3.계정_그룹_생성%20확인%20내역.png)
 
 ---
 
@@ -165,6 +171,8 @@ getfacl /home/agent-admin/agent-app/upload_files
 getfacl /home/agent-admin/agent-app/api_keys
 ```
 
+![디렉토리 구조 및 권한 확인](images/4.디렉토리%20구조%20및%20권한(ACL%20포함)%20확인%20내역.png)
+
 ---
 
 ## 5단계. 환경변수 설정
@@ -190,14 +198,6 @@ EOF
 source /home/agent-admin/.bashrc
 ```
 
-### 확인 명령어
-
-```bash
-echo $AGENT_HOME
-echo $AGENT_PORT
-echo $AGENT_LOG_DIR
-```
-
 ### 확인 결과
 
 ```
@@ -218,12 +218,6 @@ echo $AGENT_LOG_DIR
 
 ```bash
 echo "agent_api_key_test" > /home/agent-admin/agent-app/api_keys/t_secret.key
-```
-
-### 확인 명령어
-
-```bash
-cat $AGENT_KEY_PATH
 ```
 
 ### 확인 결과
@@ -254,25 +248,16 @@ $AGENT_HOME/agent_app
 ```
 >>> Starting Agent Boot Sequence...
 [1/5] Checking User Account               [OK]
- ... Running as service user 'agent-admin' (uid=1001)
 [2/5] Verifying Environment Variables     [OK]
- ... All required Envs correct
 [3/5] Checking Required Files             [OK]
- ... Verified 'secret.key' with correct key string.
 [4/5] Checking Port Availability          [OK]
- ... Port 15034 is available.
 [5/5] Verifying Log Permission            [OK]
- ... Log directory is writable: /var/log/agent-app
 ------------------------------------------------------------
 All Boot Checks Passed!
 Agent READY
 ```
 
-### 포트 확인 명령어
-
-```bash
-ss -tulnp | grep 15034
-```
+![Boot Sequence 확인](images/5.앱%20Boot%20Sequence%205단계%20%5BOK%5D%20및%20%22Agent%20READY%22%20확인%20내역.png)
 
 ### 포트 확인 결과
 
@@ -303,27 +288,7 @@ chmod 750 /home/agent-admin/agent-app/bin/monitor.sh
 -rwxr-x--- 1 agent-dev agent-core 1856 May 18 15:58 /home/agent-admin/agent-app/bin/monitor.sh
 ```
 
-### monitor.sh 실행 결과
-
-```
-====== SYSTEM MONITOR RESULT ======
-
-[HEALTH CHECK]
-Checking process 'agent_app'... [OK] (PID: 4771)
-Checking port 15034... [OK]
-
-[FIREWALL CHECK]
-Firewall status... [OK]
-
-[RESOURCE MONITORING]
-CPU Usage  : 0.0%
-MEM Usage  : 29.8%
-DISK Used  : 1%
-[WARNING] MEM threshold exceeded (29.8% > 10%)
-
-[INFO] Log appended: /var/log/agent-app/monitor.log
-======================================
-```
+![monitor.sh 실행 결과](images/6.monitorsh실행%20결과%20내역.png)
 
 ---
 
@@ -336,11 +301,9 @@ DISK Used  : 1%
 ### 명령어
 
 ```bash
-# cron 설치 및 시작
 apt-get install -y cron
 service cron start
 
-# agent-admin 계정으로 crontab 등록
 su - agent-admin
 crontab -e
 ```
@@ -349,13 +312,6 @@ crontab -e
 
 ```
 * * * * * /bin/bash /home/agent-admin/agent-app/bin/monitor.sh >> /var/log/agent-app/cron.log 2>&1
-```
-
-### 확인 명령어
-
-```bash
-crontab -l
-tail -5 /var/log/agent-app/monitor.log
 ```
 
 ### monitor.log 누적 확인 결과
@@ -367,6 +323,10 @@ tail -5 /var/log/agent-app/monitor.log
 [2026-05-18 16:48:01] PID:15 CPU:0.0% MEM:32.3% DISK_USED:1%
 [2026-05-18 16:49:01] PID:15 CPU:0.0% MEM:30.3% DISK_USED:1%
 ```
+
+![monitor.log 누적 기록 확인](images/7.var_log_agent-app_monitor.log%20누적%20기록%20확인(최근%20라인)%20내역.p.png)
+
+![crontab 매분 실행 확인](images/8.crontab%20매분%20실행%20등록%20및%20자동%20실행%20확인(1분%20후%20로그%20증가)%20내역.p.png)
 
 ---
 
@@ -445,5 +405,7 @@ if [ -n "$LOG_SIZE" ] && [ "$LOG_SIZE" -gt "$MAX_SIZE" ]; then
     mv "$LOG_FILE" "${LOG_FILE}.$(date '+%Y%m%d%H%M%S')"
 fi
 
+echo "======================================"
+```
 echo "======================================"
 ```
