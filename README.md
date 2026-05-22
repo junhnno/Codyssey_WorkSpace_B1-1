@@ -304,6 +304,84 @@ chmod 750 /home/agent-admin/agent-app/bin/monitor.sh
 
 ![monitor.sh 실행 결과](images/6.monitorsh실행%20결과%20내역.png)
 
+## monitor.sh 소스코드
+
+```bash
+#!/bin/bash
+
+LOG_FILE=/var/log/agent-app/monitor.log
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+APP_NAME="agent_app"
+APP_PORT=15034
+
+echo "====== SYSTEM MONITOR RESULT ======"
+
+echo ""
+echo "[HEALTH CHECK]"
+
+PID=$(pgrep -f "$APP_NAME" | head -1)
+if [ -z "$PID" ]; then
+    echo "Checking process '$APP_NAME'... [FAIL]"
+    exit 1
+else
+    echo "Checking process '$APP_NAME'... [OK] (PID: $PID)"
+fi
+
+PORT_STATUS=$(ss -tulnp | grep ":$APP_PORT ")
+if [ -z "$PORT_STATUS" ]; then
+    echo "Checking port $APP_PORT... [FAIL]"
+    exit 1
+else
+    echo "Checking port $APP_PORT... [OK]"
+fi
+
+echo ""
+echo "[FIREWALL CHECK]"
+UFW_STATUS=$(ufw status | grep -i "Status:" | awk '{print $2}')
+if [ "$UFW_STATUS" != "active" ]; then
+    echo "[WARNING] Firewall is not active"
+else
+    echo "Firewall status... [OK]"
+fi
+
+echo ""
+echo "[RESOURCE MONITORING]"
+
+CPU=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | cut -d'%' -f1)
+MEM=$(free | grep Mem | awk '{printf("%.1f", $3/$2*100)}')
+DISK=$(df / | tail -1 | awk '{print $5}' | tr -d '%')
+
+echo "CPU Usage  : ${CPU}%"
+echo "MEM Usage  : ${MEM}%"
+echo "DISK Used  : ${DISK}%"
+
+if (( $(echo "$CPU > 20" | bc -l) )); then
+    echo "[WARNING] CPU threshold exceeded (${CPU}% > 20%)"
+fi
+
+if (( $(echo "$MEM > 10" | bc -l) )); then
+    echo "[WARNING] MEM threshold exceeded (${MEM}% > 10%)"
+fi
+
+if [ "$DISK" -gt 80 ]; then
+    echo "[WARNING] DISK threshold exceeded (${DISK}% > 80%)"
+fi
+
+echo ""
+echo "[INFO] Log appended: $LOG_FILE"
+echo "[$TIMESTAMP] PID:$PID CPU:${CPU}% MEM:${MEM}% DISK_USED:${DISK}%" >> $LOG_FILE
+
+LOG_SIZE=$(du -b "$LOG_FILE" 2>/dev/null | cut -f1)
+MAX_SIZE=$((10 * 1024 * 1024))
+
+if [ -n "$LOG_SIZE" ] && [ "$LOG_SIZE" -gt "$MAX_SIZE" ]; then
+    ls -t ${LOG_FILE}.* 2>/dev/null | tail -n +10 | xargs rm -f
+    mv "$LOG_FILE" "${LOG_FILE}.$(date '+%Y%m%d%H%M%S')"
+fi
+
+echo "======================================"
+```
+
 ### monitor.sh 권한 정책 설명 (소유자: agent-dev, 실행자: agent-admin)
 
 monitor.sh의 권한은 `750`으로 설정되어 있습니다.
@@ -545,80 +623,3 @@ gzip /var/log/agent-app/monitor.log.2026*
 
 ---
 
-## monitor.sh 소스코드
-
-```bash
-#!/bin/bash
-
-LOG_FILE=/var/log/agent-app/monitor.log
-TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-APP_NAME="agent_app"
-APP_PORT=15034
-
-echo "====== SYSTEM MONITOR RESULT ======"
-
-echo ""
-echo "[HEALTH CHECK]"
-
-PID=$(pgrep -f "$APP_NAME" | head -1)
-if [ -z "$PID" ]; then
-    echo "Checking process '$APP_NAME'... [FAIL]"
-    exit 1
-else
-    echo "Checking process '$APP_NAME'... [OK] (PID: $PID)"
-fi
-
-PORT_STATUS=$(ss -tulnp | grep ":$APP_PORT ")
-if [ -z "$PORT_STATUS" ]; then
-    echo "Checking port $APP_PORT... [FAIL]"
-    exit 1
-else
-    echo "Checking port $APP_PORT... [OK]"
-fi
-
-echo ""
-echo "[FIREWALL CHECK]"
-UFW_STATUS=$(ufw status | grep -i "Status:" | awk '{print $2}')
-if [ "$UFW_STATUS" != "active" ]; then
-    echo "[WARNING] Firewall is not active"
-else
-    echo "Firewall status... [OK]"
-fi
-
-echo ""
-echo "[RESOURCE MONITORING]"
-
-CPU=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | cut -d'%' -f1)
-MEM=$(free | grep Mem | awk '{printf("%.1f", $3/$2*100)}')
-DISK=$(df / | tail -1 | awk '{print $5}' | tr -d '%')
-
-echo "CPU Usage  : ${CPU}%"
-echo "MEM Usage  : ${MEM}%"
-echo "DISK Used  : ${DISK}%"
-
-if (( $(echo "$CPU > 20" | bc -l) )); then
-    echo "[WARNING] CPU threshold exceeded (${CPU}% > 20%)"
-fi
-
-if (( $(echo "$MEM > 10" | bc -l) )); then
-    echo "[WARNING] MEM threshold exceeded (${MEM}% > 10%)"
-fi
-
-if [ "$DISK" -gt 80 ]; then
-    echo "[WARNING] DISK threshold exceeded (${DISK}% > 80%)"
-fi
-
-echo ""
-echo "[INFO] Log appended: $LOG_FILE"
-echo "[$TIMESTAMP] PID:$PID CPU:${CPU}% MEM:${MEM}% DISK_USED:${DISK}%" >> $LOG_FILE
-
-LOG_SIZE=$(du -b "$LOG_FILE" 2>/dev/null | cut -f1)
-MAX_SIZE=$((10 * 1024 * 1024))
-
-if [ -n "$LOG_SIZE" ] && [ "$LOG_SIZE" -gt "$MAX_SIZE" ]; then
-    ls -t ${LOG_FILE}.* 2>/dev/null | tail -n +10 | xargs rm -f
-    mv "$LOG_FILE" "${LOG_FILE}.$(date '+%Y%m%d%H%M%S')"
-fi
-
-echo "======================================"
-```
