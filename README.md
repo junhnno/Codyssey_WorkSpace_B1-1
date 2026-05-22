@@ -257,14 +257,14 @@ All Boot Checks Passed!
 Agent READY
 ```
 
-![Boot Sequence 확인](images/5.앱 Boot Sequence 5단계 [OK] 및 “Agent READY” 확인 내역.png)
+![Boot Sequence 확인](images/5.앱%20Boot%20Sequence%205단계%20%5BOK%5D%20및%20%22Agent%20READY%22%20확인%20내역.png)
 
 ### 포트 확인 결과
 
 ```
 tcp   LISTEN 0  1  0.0.0.0:15034  0.0.0.0:*  users:(("agent_app",pid=4772,fd=4))
 ```
-
+  
 ---
 
 ## 8단계. monitor.sh 작성
@@ -324,9 +324,8 @@ crontab -e
 [2026-05-18 16:49:01] PID:15 CPU:0.0% MEM:30.3% DISK_USED:1%
 ```
 
-![monitor.log 누적 기록 확인](images/7.var_log_agent-app_monitor.log%20누적%20기록%20확인(최근%20라인)%20내역.p.png)
-
-![crontab 매분 실행 확인](images/8.crontab%20매분%20실행%20등록%20및%20자동%20실행%20확인(1분%20후%20로그%20증가)%20내역.p.png)
+![monitor.log 누적 기록 확인](images/7.monitor_log.png)
+![crontab 매분 실행 확인](images/8.crontab.png)
 
 ---
 
