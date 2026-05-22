@@ -257,7 +257,7 @@ All Boot Checks Passed!
 Agent READY
 ```
 
-![Boot Sequence 확인](images/5.앱%20Boot%20Sequence%205단계%20%5BOK%5D%20및%20%22Agent%20READY%22%20확인%20내역.png)
+![Boot Sequence 확인](images/5.앱 Boot Sequence 5단계 [OK] 및 “Agent READY” 확인 내역.png)
 
 ### 포트 확인 결과
 
