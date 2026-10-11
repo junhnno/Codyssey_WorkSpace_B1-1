@@ -58,12 +58,16 @@ document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
 const statusBox = document.querySelector('#projects-status');
 const listBox = document.querySelector('#projects-list');
 
-let projectsState = { status: 'loading', repos: [] };
+const filterBox = document.querySelector('#projects-filter');
+
+// filter: 선택된 언어 ('all' 이면 전체)
+let projectsState = { status: 'loading', repos: [], filter: 'all' };
 
 const renderProjects = () => {
-  const { status, repos } = projectsState;
+  const { status, repos, filter } = projectsState;
   listBox.innerHTML = '';
   statusBox.innerHTML = '';
+  filterBox.innerHTML = '';
 
   if (status === 'loading') {
     statusBox.innerHTML = '<div class="spinner"></div><p>로딩 중...</p>';
@@ -75,7 +79,23 @@ const renderProjects = () => {
   } else if (status === 'empty') {
     statusBox.textContent = '표시할 프로젝트가 없습니다.';
   } else {
-    listBox.innerHTML = repos.map(({ name, description, language, stargazers_count, html_url }) => `
+    // 필터 버튼: 저장소 언어 목록(중복 제거) + 전체
+    const languages = ['all', ...new Set(repos.map((repo) => repo.language).filter(Boolean))];
+    filterBox.innerHTML = languages.map((lang) => `
+      <button type="button" class="filter-btn ${lang === filter ? 'active' : ''}" data-lang="${lang}">
+        ${lang === 'all' ? '전체' : lang}
+      </button>`).join('');
+    filterBox.querySelectorAll('.filter-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        projectsState.filter = btn.dataset.lang; // 이벤트 -> 상태 변경
+        renderProjects();                        // 상태 -> 화면 업데이트
+      });
+    });
+
+    // filter: 선택된 언어의 저장소만 표시
+    const visible = filter === 'all' ? repos : repos.filter((repo) => repo.language === filter);
+
+    listBox.innerHTML = visible.map(({ name, description, language, stargazers_count, html_url }) => `
       <article class="card">
         <h3><a href="${html_url}" target="_blank" rel="noopener">${name}</a></h3>
         <p>${description || '설명 없음'}</p>
@@ -85,17 +105,17 @@ const renderProjects = () => {
 };
 
 const loadProjects = async () => {
-  projectsState = { status: 'loading', repos: [] };
+  projectsState = { status: 'loading', repos: [], filter: 'all' };
   renderProjects();
   try {
     const res = await fetch(`https://api.github.com/users/${GITHUB_ID}/repos`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`); // 403 레이트 리밋 포함
     const repos = await res.json();
     projectsState = repos.length === 0
-      ? { status: 'empty', repos: [] }
-      : { status: 'success', repos };
+      ? { status: 'empty', repos: [], filter: 'all' }
+      : { status: 'success', repos, filter: 'all' };
   } catch (err) {
-    projectsState = { status: 'error', repos: [] };
+    projectsState = { status: 'error', repos: [], filter: 'all' };
   }
   renderProjects();
 };

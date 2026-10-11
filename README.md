@@ -18,6 +18,11 @@ https://junhnno.github.io/<저장소명>/  (GitHub Pages 배포 후 실제 주�
 - 스크롤 애니메이션
 - Contact 폼 유효성 검사 (필수값, 이메일 형식)
 - GitHub API 연동 (로딩 / 성공 / 에러 + 재시도 / 빈 상태)
+- 프로젝트 언어별 필터링 (`Array.filter` 사용, 보너스)
+
+## Flexbox와 Grid 선택 이유
+- **네비게이션 = Flexbox**: 로고, 메뉴, 버튼을 한 줄(1차원)로 늘어놓고 양끝 정렬하는 용도라 Flexbox가 맞습니다.
+- **프로젝트 카드 = Grid**: 카드를 행/열(2차원)로 배치하고, `auto-fit` + `minmax`로 화면 너비에 따라 열 수가 자동으로 바뀌어야 해서 Grid가 맞습니다.
 
 ## 기준값
 | 항목 | 값 |

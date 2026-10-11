@@ -38,7 +38,8 @@ body {
 a { color: var(--primary); text-decoration: none; }
 ul { list-style: none; }
 
-/* ===== 헤더 / 네비게이션 (Flexbox) ===== */
+/* ===== 헤더 / 네비게이션 (Flexbox) =====
+   Flexbox를 쓴 이유: 로고-메뉴-버튼을 한 줄(1차원)로 배치하고 좌우로 벌리는 구조라서 */
 .header {
   position: fixed;
   top: 0;
@@ -136,7 +137,8 @@ ul { list-style: none; }
   border-radius: 20px;
 }
 
-/* ===== Projects (Grid) ===== */
+/* ===== Projects (Grid) =====
+   Grid를 쓴 이유: 카드를 행과 열(2차원)로 배치하고, auto-fit/minmax로 화면 너비에 따라 열 수를 자동 조절하기 위해서 */
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -157,6 +159,21 @@ ul { list-style: none; }
 .card .meta { font-size: 0.9rem; opacity: 0.8; }
 
 .status { text-align: center; }
+
+.filter { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: var(--gap); }
+
+.filter-btn {
+  background: var(--bg-alt);
+  color: var(--text);
+  border: 1px solid var(--primary);
+  border-radius: 20px;
+  padding: 0.3rem 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.filter-btn:hover { transform: translateY(-2px); }
+.filter-btn.active { background: var(--primary); color: #fff; }
 
 .spinner {
   width: 36px;
