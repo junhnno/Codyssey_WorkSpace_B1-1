@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>황준호 | Portfolio</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+  <header id="header" class="header">
+    <nav class="nav">
+      <a href="#hero" class="logo">Junho</a>
+      <ul id="menu" class="menu">
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <div class="nav-buttons">
+        <button id="theme-toggle" class="icon-btn" type="button" aria-label="다크 모드 전환">🌙</button>
+        <button id="hamburger" class="icon-btn hamburger" type="button" aria-label="메뉴 열기">☰</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section id="hero" class="hero">
+      <h1>안녕하세요!<br>백엔드 개발자를 꿈꾸는 황준호입니다.</h1>
+      <p>Python과 FastAPI로 서버를 만들고 있습니다.</p>
+      <div class="hero-buttons">
+        <a href="#projects" class="btn">View Projects</a>
+        <a href="#contact" class="btn btn-outline">Contact</a>
+      </div>
+    </section>
+
+    <section id="about" class="section fade-in">
+      <h2>About Me</h2>
+      <div class="about">
+        <img src="images/profile.svg" alt="황준호의 프로필 이미지" width="200" height="200">
+        <p>동국대학교 컴퓨터공학과에 재학 중인 복학생입니다. 백엔드 개발자를 목표로 Python, FastAPI, Django, PostgreSQL, Docker를 공부하고 있으며, 장기적으로는 Spring/Java로 확장할 계획입니다.</p>
+      </div>
+    </section>
+
+    <section id="skills" class="section fade-in">
+      <h2>Skills</h2>
+      <ul class="skills">
+        <li>Python</li>
+        <li>FastAPI</li>
+        <li>Django / DRF</li>
+        <li>PostgreSQL</li>
+        <li>SQLAlchemy</li>
+        <li>Docker</li>
+        <li>HTML / CSS / JS</li>
+      </ul>
+    </section>
+
+    <section id="projects" class="section fade-in">
+      <h2>Projects</h2>
+      <div id="projects-status" class="status"></div>
+      <div id="projects-list" class="projects-grid"></div>
+    </section>
+
+    <section id="contact" class="section fade-in">
+      <h2>Contact</h2>
+      <form id="contact-form" novalidate>
+        <div class="field">
+          <label for="name">이름</label>
+          <input type="text" id="name" name="name">
+          <p class="error" id="name-error"></p>
+        </div>
+        <div class="field">
+          <label for="email">이메일</label>
+          <input type="email" id="email" name="email">
+          <p class="error" id="email-error"></p>
+        </div>
+        <div class="field">
+          <label for="message">메시지</label>
+          <textarea id="message" name="message" rows="5"></textarea>
+          <p class="error" id="message-error"></p>
+        </div>
+        <button type="submit" class="btn">Send</button>
+        <p id="form-success" class="success"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2026 황준호</p>
+    <a href="https://github.com/junhnno" target="_blank" rel="noopener">GitHub</a>
+  </footer>
+
+  <button id="scroll-top" class="scroll-top" type="button" aria-label="맨 위로 이동">↑</button>
+</body>
+</html>
