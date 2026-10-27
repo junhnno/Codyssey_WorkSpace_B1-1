@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>황준호 | Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/main.js" defer></script>
 </head>
@@ -26,11 +29,23 @@
 
   <main>
     <section id="hero" class="hero">
-      <h1>안녕하세요!<br>백엔드 개발자를 꿈꾸는 황준호입니다.</h1>
-      <p>Python과 FastAPI로 서버를 만들고 있습니다.</p>
-      <div class="hero-buttons">
-        <a href="#projects" class="btn">View Projects</a>
-        <a href="#contact" class="btn btn-outline">Contact</a>
+      <div class="hero-inner">
+        <div class="hero-text">
+          <h1>안녕하세요!<br>백엔드 개발자를 꿈꾸는 황준호입니다.</h1>
+          <p> [사이렌] 이 얼마남지 않아 쫓기고 있습니다</p>
+          <div class="hero-buttons">
+            <a href="#projects" class="btn">View Projects</a>
+            <a href="#contact" class="btn btn-outline">Contact</a>
+          </div>
+        </div>
+        <div class="hero-panel" aria-hidden="true">
+          <div class="panel-bar">
+            <span class="method">GET</span>
+            <span class="path">/users/junho</span>
+            <span class="chip chip-ok">200 OK</span>
+          </div>
+          <pre><code id="hero-code" class="typing"></code></pre>
+        </div>
       </div>
     </section>
 
@@ -38,7 +53,7 @@
       <h2>About Me</h2>
       <div class="about">
         <img src="images/profile.svg" alt="황준호의 프로필 이미지" width="200" height="200">
-        <p>동국대학교 컴퓨터공학과에 재학 중인 학생입니다. 백엔드 개발자를 목표로 Python, FastAPI, Django, PostgreSQL, Docker를 공부하고 있으며, 장기적으로는 Spring/Java로 확장할 계획입니다.</p>
+        <p> 코디세이 마리너 1기입니다. 백엔드 개발자를 목표로 Python, FastAPI, Django, PostgreSQL, Docker를 공부하고 있으며, 장기적으로는 Spring/Java로 확장할 계획입니다.</p>
       </div>
     </section>
 
@@ -58,7 +73,7 @@
     <section id="projects" class="section fade-in">
       <h2>Projects</h2>
       <div id="projects-filter" class="filter"></div>
-      <div id="projects-status" class="status"></div>
+      <div id="projects-status" class="status" aria-live="polite"></div>
       <div id="projects-list" class="projects-grid"></div>
     </section>
 
@@ -68,20 +83,20 @@
         <div class="field">
           <label for="name">이름</label>
           <input type="text" id="name" name="name">
-          <p class="error" id="name-error"></p>
+          <p class="error" id="name-error" aria-live="polite"></p>
         </div>
         <div class="field">
           <label for="email">이메일</label>
           <input type="email" id="email" name="email">
-          <p class="error" id="email-error"></p>
+          <p class="error" id="email-error" aria-live="polite"></p>
         </div>
         <div class="field">
           <label for="message">메시지</label>
           <textarea id="message" name="message" rows="5"></textarea>
-          <p class="error" id="message-error"></p>
+          <p class="error" id="message-error" aria-live="polite"></p>
         </div>
         <button type="submit" class="btn">Send</button>
-        <p id="form-success" class="success"></p>
+        <p id="form-success" class="success" aria-live="polite"></p>
       </form>
     </section>
   </main>

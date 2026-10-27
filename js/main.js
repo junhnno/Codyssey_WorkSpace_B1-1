@@ -64,20 +64,27 @@ const filterBox = document.querySelector('#projects-filter');
 let projectsState = { status: 'loading', repos: [], filter: 'all' };
 
 const renderProjects = () => {
-  const { status, repos, filter } = projectsState;
+  const { status, repos, filter, code } = projectsState;
   listBox.innerHTML = '';
   statusBox.innerHTML = '';
   filterBox.innerHTML = '';
 
   if (status === 'loading') {
-    statusBox.innerHTML = '<div class="spinner"></div><p>로딩 중...</p>';
-  } else if (status === 'error') {
     statusBox.innerHTML = `
-      <p>프로젝트를 불러올 수 없습니다.</p>
+      <div class="spinner"></div>
+      <p>로딩 중... <code>GET /users/${GITHUB_ID}/repos</code></p>`;
+  } else if (status === 'error') {
+    // 403이면 GitHub 레이트 리밋(시간당 60회)일 가능성이 높다
+    const hint = code === 403
+      ? '<p class="hint">GitHub API 요청 한도를 넘었을 수 있습니다. 잠시 후 다시 시도해 주세요.</p>'
+      : '';
+    statusBox.innerHTML = `
+      <p><span class="chip chip-err">${code}</span> 프로젝트를 불러올 수 없습니다.</p>
+      ${hint}
       <button id="retry-btn" class="btn" type="button">다시 시도</button>`;
     document.querySelector('#retry-btn').addEventListener('click', loadProjects);
   } else if (status === 'empty') {
-    statusBox.textContent = '표시할 프로젝트가 없습니다.';
+    statusBox.innerHTML = '<p><span class="chip chip-warn">204</span> 표시할 프로젝트가 없습니다.</p>';
   } else {
     // 필터 버튼: 저장소 언어 목록(중복 제거) + 전체
     const languages = ['all', ...new Set(repos.map((repo) => repo.language).filter(Boolean))];
@@ -109,18 +116,64 @@ const loadProjects = async () => {
   renderProjects();
   try {
     const res = await fetch(`https://api.github.com/users/${GITHUB_ID}/repos`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`); // 403 레이트 리밋 포함
+    if (!res.ok) { // 403 레이트 리밋 포함
+      const error = new Error(`HTTP ${res.status}`);
+      error.status = res.status;
+      throw error;
+    }
     const repos = await res.json();
     projectsState = repos.length === 0
       ? { status: 'empty', repos: [], filter: 'all' }
       : { status: 'success', repos, filter: 'all' };
   } catch (err) {
-    projectsState = { status: 'error', repos: [], filter: 'all' };
+    projectsState = { status: 'error', repos: [], filter: 'all', code: err.status || 'ERR' };
   }
   renderProjects();
 };
 
 loadProjects();
+
+/* ===== 히어로: JSON 응답 타이핑 효과 ===== */
+const heroCode = document.querySelector('#hero-code');
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const heroStack = ['Python', 'FastAPI', 'Django', 'PostgreSQL', 'Docker'];
+
+// { text, cls }: 한 덩어리씩 색을 입혀 타이핑한다
+const heroSegments = [
+  { text: '{\n  ', cls: 'tok-dim' },
+  { text: '"name"', cls: 'tok-key' }, { text: ': ', cls: 'tok-dim' },
+  { text: '"황준호"', cls: 'tok-str' }, { text: ',\n  ', cls: 'tok-dim' },
+  { text: '"school"', cls: 'tok-key' }, { text: ': ', cls: 'tok-dim' },
+  { text: '"동국대 컴퓨터공학과"', cls: 'tok-str' }, { text: ',\n  ', cls: 'tok-dim' },
+  { text: '"stack"', cls: 'tok-key' }, { text: ': [\n    ', cls: 'tok-dim' },
+  ...heroStack.flatMap((item, i) => [
+    { text: `"${item}"`, cls: 'tok-str' },
+    { text: i < heroStack.length - 1 ? ',\n    ' : '\n  ]', cls: 'tok-dim' },
+  ]),
+  { text: ',\n  ', cls: 'tok-dim' },
+  { text: '"learning"', cls: 'tok-key' }, { text: ': ', cls: 'tok-dim' },
+  { text: '"Spring / Java"', cls: 'tok-str' }, { text: '\n}', cls: 'tok-dim' },
+];
+
+const typeHeroResponse = async () => {
+  for (const { text, cls } of heroSegments) {
+    const span = document.createElement('span');
+    span.className = cls;
+    heroCode.appendChild(span);
+    if (reduceMotion) {
+      span.textContent = text; // 모션 줄이기 설정이면 한 번에 표시
+    } else {
+      for (const char of text) {
+        span.textContent += char;
+        await sleep(22);
+      }
+    }
+  }
+};
+
+typeHeroResponse();
 
 /* ===== 폼 유효성 검사 ===== */
 const form = document.querySelector('#contact-form');
@@ -155,9 +208,10 @@ form.addEventListener('submit', (event) => {
   event.preventDefault();
   const results = Object.keys(validators).map(validateField);
   if (results.every(Boolean)) {
-    successMsg.textContent = '문의가 정상적으로 접수되었습니다. 감사합니다!';
+    // 데모 폼: 실제 전송은 하지 않는다
+    successMsg.innerHTML = '<span class="chip chip-ok">200</span> 입력값 검증을 통과했습니다. (데모 폼이라 실제 전송은 되지 않습니다)';
     form.reset();
   } else {
-    successMsg.textContent = '';
+    successMsg.innerHTML = '<span class="chip chip-err">422</span> 입력값을 확인해 주세요.';
   }
 });
