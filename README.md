@@ -2,6 +2,9 @@
 
 순수 HTML/CSS/JavaScript로 만든 반응형 포트폴리오 웹사이트입니다.
 
+## 배포 URL
+https://junhnno.github.io/Codyssey_WorkSpace_B1-1/
+
 ## 사용 기술
 - HTML5 (시맨틱 태그)
 - CSS3 (CSS 변수, Flexbox, Grid, 미디어쿼리)
@@ -37,4 +40,19 @@ index.html
 css/style.css
 js/main.js
 images/profile.svg
+images/screenshot-*.png
 ```
+
+## 스크린샷
+
+### 데스크톱
+![데스크톱 화면](images/screenshot-desktop.png)
+
+### 모바일
+![모바일 화면](images/screenshot-mobile.png)
+
+### 모바일 (햄버거 메뉴 열림)
+![모바일 햄버거 메뉴](images/screenshot-mobile-menu.png)
+
+### 다크 모드
+![다크 모드 화면](images/screenshot-dark.png)
